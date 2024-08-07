@@ -2,6 +2,7 @@ const puzzleSize = 3;
 const puzzleContainer = document.getElementById('puzzle');
 let tiles = [];
 let solvedOrder = [];
+let imageUrl = '';
 
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -15,22 +16,60 @@ function getSolvedOrder() {
     return Array.from({ length: puzzleSize * puzzleSize - 1 }, (_, i) => i + 1).concat(null);
 }
 
-function initializePuzzle() {
+async function fetchRandomImage() {
+    try {
+        imageUrl = response.url;
+        console.log(`Fetched Image URL: ${imageUrl}`);
+    } catch (error) {
+        console.error('Error fetching image:', error);
+    }
+}
+
+function isSolvable(array) {
+    let inversions = 0;
+    for (let i = 0; i < array.length; i++) {
+        for (let j = i + 1; j < array.length; j++) {
+            if (array[i] && array[j] && array[i] > array[j]) {
+                inversions++;
+            }
+        }
+    }
+    return inversions % 2 === 0;
+}
+
+function getShuffledOrder() {
+    let shuffled;
+    do {
+        shuffled = shuffle(getSolvedOrder().slice());
+    } while (!isSolvable(shuffled));
+    return shuffled;
+}
+
+async function initializePuzzle() {
+    await fetchRandomImage();
     tiles = [];
     puzzleContainer.innerHTML = '';
 
-    let tileNumbers = getSolvedOrder();
-    tileNumbers = shuffle(tileNumbers);
+    let tileNumbers = getShuffledOrder();
 
     for (let i = 0; i < puzzleSize * puzzleSize; i++) {
         const tile = document.createElement('div');
         tile.className = 'puzzle-tile';
-        tile.dataset.index = i;
+        const row = Math.floor(i / puzzleSize);
+        const col = i % puzzleSize;
+
+        tile.style.width = `${tileSize}px`;
+        tile.style.height = `${tileSize}px`;
+        tile.style.float = 'left';
+        tile.style.backgroundImage = `url(${imageUrl})`;
+        tile.style.backgroundSize = `${puzzleSize * tileSize}px ${puzzleSize * tileSize}px`;
+
         if (tileNumbers[i] === null) {
             tile.classList.add('empty-tile');
         } else {
-            tile.textContent = tileNumbers[i];
+            tile.style.backgroundPosition = `${-col * tileSize}px ${-row * tileSize}px`;
         }
+
         tile.addEventListener('click', () => handleTileClick(i));
         puzzleContainer.appendChild(tile);
         tiles.push(tile);
@@ -45,10 +84,11 @@ function handleTileClick(index) {
     const [emptyRow, emptyCol] = [Math.floor(emptyIndex / puzzleSize), emptyIndex % puzzleSize];
     
     if (Math.abs(row - emptyRow) + Math.abs(col - emptyCol) === 1) {
-        tiles[emptyIndex].textContent = tiles[index].textContent;
-        tiles[index].textContent = '';
-        tiles[emptyIndex].classList.remove('empty-tile');
+        tiles[emptyIndex].style.backgroundImage = tiles[index].style.backgroundImage;
+        tiles[emptyIndex].style.backgroundPosition = tiles[index].style.backgroundPosition;
+        tiles[index].style.backgroundImage = '';
         tiles[index].classList.add('empty-tile');
+        tiles[emptyIndex].classList.remove('empty-tile');
 
         if (isPuzzleSolved()) {
             showWinningScreen();
@@ -57,12 +97,22 @@ function handleTileClick(index) {
 }
 
 function isPuzzleSolved() {
-    return tiles.every((tile, index) => {
+    for (let i = 0; i < tiles.length; i++) {
+        const tile = tiles[i];
+
         if (tile.classList.contains('empty-tile')) {
-            return solvedOrder[index] === null;
+            if (i !== tiles.length - 1) {
+                return false;
+            }
+        } else {
+            const correctNumber = solvedOrder[i];
+
+            if (correctNumber !== tileNumber) {
+                return false;
+            }
         }
-        return parseInt(tile.textContent) === solvedOrder[index];
-    });
+    }
+    return true;
 }
 
 function showWinningScreen() {
