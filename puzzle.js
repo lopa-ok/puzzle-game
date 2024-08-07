@@ -2,7 +2,6 @@ const puzzleSize = 3;
 const puzzleContainer = document.getElementById('puzzle');
 let tiles = [];
 let solvedOrder = [];
-let imageUrl = '';
 
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -20,6 +19,7 @@ async function fetchRandomImage() {
     try {
         imageUrl = response.url;
         console.log(`Fetched Image URL: ${imageUrl}`);
+        document.getElementById('previewImage').src = imageUrl;
     } catch (error) {
         console.error('Error fetching image:', error);
     }
@@ -67,7 +67,9 @@ async function initializePuzzle() {
         if (tileNumbers[i] === null) {
             tile.classList.add('empty-tile');
         } else {
-            tile.style.backgroundPosition = `${-col * tileSize}px ${-row * tileSize}px`;
+            const shuffledRow = Math.floor((tileNumbers[i] - 1) / puzzleSize);
+            const shuffledCol = (tileNumbers[i] - 1) % puzzleSize;
+            tile.style.backgroundPosition = `${-shuffledCol * tileSize}px ${-shuffledRow * tileSize}px`;
         }
 
         tile.addEventListener('click', () => handleTileClick(i));
@@ -86,9 +88,10 @@ function handleTileClick(index) {
     if (Math.abs(row - emptyRow) + Math.abs(col - emptyCol) === 1) {
         tiles[emptyIndex].style.backgroundImage = tiles[index].style.backgroundImage;
         tiles[emptyIndex].style.backgroundPosition = tiles[index].style.backgroundPosition;
-        tiles[index].style.backgroundImage = '';
+        tiles[emptyIndex].dataset.number = tiles[index].dataset.number;
         tiles[index].classList.add('empty-tile');
         tiles[emptyIndex].classList.remove('empty-tile');
+        delete tiles[index].dataset.number;
 
         if (isPuzzleSolved()) {
             showWinningScreen();
@@ -106,6 +109,7 @@ function isPuzzleSolved() {
             }
         } else {
             const correctNumber = solvedOrder[i];
+            const tileNumber = tile.dataset.number ? parseInt(tile.dataset.number) : null;
 
             if (correctNumber !== tileNumber) {
                 return false;
@@ -125,7 +129,7 @@ function showWinningScreen() {
 function resetPuzzle() {
     const winningScreen = document.querySelector('.winning-screen');
     if (winningScreen) {
-        winningScreen.remove();
+        winningScreen.classList.add('hidden');
     }
     initializePuzzle();
 }

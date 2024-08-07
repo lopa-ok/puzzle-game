@@ -52,6 +52,10 @@ button {
     text-align: center;
 }
 
+.hidden {
+    display: none;
+}
+
 .winning-screen h1 {
     font-size: 48px;
     margin: 0;
@@ -59,4 +63,37 @@ button {
 
 .winning-screen button {
     margin-top: 20px;
+}
+
+#puzzle {
+    width: 300px;
+    height: 300px;
+    border: 1px solid #000;
+    position: relative;
+}
+
+.preview-container {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 10; /* Ensure it is above other content */
+}
+
+.preview-container span {
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.preview-container img {
+    display: none;
+    width: 100px;
+    height: 100px;
+    border: 1px solid #000;
+}
+
+.preview-container:hover img {
+    display: block;
 }

@@ -3,12 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sliding Puzzle</title>
+    <title>Puzzle Game</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="puzzle-container" id="puzzle"></div>
-    <button onclick="resetPuzzle()">Reset Puzzle</button>
+    <div id="puzzle"></div>
+    <div class="winning-screen hidden">
+        <h1>You Win!</h1>
+        <button onclick="resetPuzzle()">Play Again</button>
+    </div>
+    <div class="preview-container">
+        <span>?</span>
+        <img id="previewImage" src="" alt="Preview Image">
+    </div>
     <script src="puzzle.js"></script>
 </body>
 </html>
