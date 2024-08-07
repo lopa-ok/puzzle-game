@@ -5,11 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Puzzle Game</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
 </head>
 <body>
-    <div id="puzzle"></div>
-    <div class="winning-screen hidden">
-        <h1>You Win!</h1>
+    <div class="game-container">
+        <select id="difficulty">
+            <option value="3">Easy</option>
+            <option value="4">Medium</option>
+            <option value="5">Hard</option>
+        </select>
+        <div id="puzzle"></div>
+    <div class="winning-screen">
         <button onclick="resetPuzzle()">Play Again</button>
     </div>
     <div class="preview-container">
